@@ -5,9 +5,10 @@
     var Observable = require('FuseJS/Observable');
     var _ = require('lodash');
 
-    function Cell(index) {
+    function Cell(x, y) {
       this.state = Observable("closed");
-      this.index = index;
+      this.x = x;
+      this.y = y;
       this.hasMine = false;
       this.mineRadar = 0;
       this.isOpen = false;
@@ -24,8 +25,10 @@
 
     Board.prototype = {
       initBoard: function() {
-        this.cells = _.times(this.width*this.height, function(ix) {
-          return new Cell(ix);
+        var self = this;
+        self.cells = [];
+        self.iterateCells(function(cell, x, y) {
+          self.cells.push(new Cell(x, y));
         });
       },
       placeMines: function() {
@@ -62,7 +65,27 @@
         if( cell.hasMine ) {
           cell.state.value = "mine";
         } else {
-          cell.state.value = "clear";
+          this.recursiveOpen(cell.x, cell.y);
+        }
+      },
+      recursiveOpen: function(x, y) {
+        var cell = this.cellAt(x, y);
+        if( !cell ) return;
+
+        if( cell.state.value != 'closed' ) return;
+
+        cell.state.value = "clear";
+        if( cell.mineRadar == 0 ) {
+          this.recursiveOpen(x-1, y-1);
+          this.recursiveOpen(x  , y-1);
+          this.recursiveOpen(x+1, y-1);
+
+          this.recursiveOpen(x-1, y);
+          this.recursiveOpen(x+1, y);
+
+          this.recursiveOpen(x-1, y+1);
+          this.recursiveOpen(x  , y+1);
+          this.recursiveOpen(x+1, y+1);
         }
       },
       iterateCells: function(callback) {
@@ -86,7 +109,7 @@
       }
     };
 
-    var board = new Board(4,4,4);
+    var board = new Board(4,4,1);
     console.log(board.toString());
 
     function cellClicked(item) {
