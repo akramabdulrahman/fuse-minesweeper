@@ -1,0 +1,119 @@
+<App Theme="Basic">
+  <JavaScript File="lodash.js" ux:Global="lodash" />
+  <JavaScript>
+    console.log("---------------------------------");
+    var Observable = require('FuseJS/Observable');
+    var _ = require('lodash');
+
+    function Cell(index) {
+      this.state = Observable("closed");
+      this.index = index;
+      this.hasMine = false;
+      this.mineRadar = 0;
+      this.isOpen = false;
+    }
+
+    function Board(width, height, numberOfMines) {
+      this.width = width;
+      this.height = height;
+      this.numberOfMines = numberOfMines;
+      this.initBoard();
+      this.placeMines();
+      this.updateMineRadar();
+    }
+
+    Board.prototype = {
+      initBoard: function() {
+        this.cells = _.times(this.width*this.height, function(ix) {
+          return new Cell(ix);
+        });
+      },
+      placeMines: function() {
+        var minesLeft = this.numberOfMines;
+        while( minesLeft>0 ) {
+          var ix = Math.floor(Math.random()*this.width*this.height);
+          if( !this.cells[ix].hasMine ) {
+            this.cells[ix].hasMine = true;
+            minesLeft--;
+          }
+        }
+      },
+      minesAt: function(x,y) {
+        if( x>=0 && y>=0 && x<this.width && y<this.height ) {
+          return this.cells[this.width*y + x].hasMine ? 1 : 0;
+        } else {
+          return 0;
+        }
+      },
+      updateMineRadar: function() {
+        var self = this;
+        self.iterateCells(function(cell, x, y) {
+          cell.mineRadar = 
+            self.minesAt(x-1, y-1) + self.minesAt(x, y-1) + self.minesAt(x+1, y-1) +
+            self.minesAt(x-1, y  ) + self.minesAt(x, y  ) + self.minesAt(x+1, y  ) +
+            self.minesAt(x-1, y+1) + self.minesAt(x, y+1) + self.minesAt(x+1, y+1);
+        });
+      },
+      cellClicked: function(cell) {
+        if( cell.hasMine ) {
+          cell.state.value = "mine";
+        } else {
+          cell.state.value = "clear";
+        }
+      },
+      iterateCells: function(callback) {
+        var self = this;
+        _.times(self.height, function(y) {
+          _.times(self.width, function(x) {
+            var cell = self.cells[y*self.width + x];
+            callback.call(self, cell, x, y);
+          });
+        });
+      },
+      toString: function() {
+        var self = this;
+        var string = "";
+        this.iterateCells(function(cell, x, y) {
+            if( x==0 && y>0 ) string += "\n";
+            string += "["+ (cell.hasMine?'*':' ') +cell.mineRadar +"]";
+        });
+
+        return string;
+      }
+    };
+
+    var board = new Board(4,4,4);
+    console.log(board.toString());
+
+    function cellClicked(item) {
+      board.cellClicked(item.data);
+    }
+
+    module.exports = {
+      cells: Observable.apply(this, board.cells),
+      cellClicked: cellClicked
+    };
+
+  </JavaScript>
+
+  <Grid Alignment="Center" ColumnCount="4" DefaultColumn="auto">
+    <Each Items="{cells}">
+
+      <Panel Clicked="{cellClicked}" Width="40" Height="40">
+        <Match Value="{state}">
+          <Case String="closed">
+            <Rectangle Width="30" Height="30" CornerRadius="5" Fill="#808080"/>
+          </Case>
+          <Case String="clear">
+            <Text ContentAlignment="Center" Value="{mineRadar}" Width="30" Height="30"/>
+            <Rectangle Width="30" Height="30" CornerRadius="5" Fill="#808080"/>
+          </Case>
+          <Case String="mine">
+            <Image File="Assets/mine.png" Width="30"/>
+          </Case>
+        </Match>
+      </Panel>
+
+    </Each>
+  </Grid>
+</App>
