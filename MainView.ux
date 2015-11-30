@@ -74,7 +74,7 @@
 
         if( cell.state.value != 'closed' ) return;
 
-        cell.state.value = "clear";
+        cell.state.value = cell.mineRadar==0 ? "minesFarAway" : "minesNear";
         if( cell.mineRadar == 0 ) {
           this.recursiveOpen(x-1, y-1);
           this.recursiveOpen(x  , y-1);
@@ -109,21 +109,23 @@
       }
     };
 
-    var board = new Board(4,4,1);
+    var board = new Board(8, 8, 8);
     console.log(board.toString());
 
     function cellClicked(item) {
       board.cellClicked(item.data);
     }
 
+
     module.exports = {
       cells: Observable.apply(this, board.cells),
-      cellClicked: cellClicked
+      cellClicked: cellClicked,
+      board: board
     };
 
   </JavaScript>
 
-  <Grid Alignment="Center" ColumnCount="4" DefaultColumn="auto">
+  <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto">
     <Each Items="{cells}">
 
       <Panel Clicked="{cellClicked}" Width="40" Height="40">
@@ -131,8 +133,11 @@
           <Case String="closed">
             <Rectangle Width="30" Height="30" CornerRadius="5" Fill="#808080"/>
           </Case>
-          <Case String="clear">
+          <Case String="minesNear">
             <Text Alignment="Center" Value="{mineRadar}" Width="30" Height="30"/>
+          </Case>
+          <Case String="minesFarAway">
+            <Rectangle Width="30" Height="30" CornerRadius="5" Fill="#F0F0F0"/>
           </Case>
           <Case String="mine">
             <Image File="Assets/mine.png" Width="30"/>
