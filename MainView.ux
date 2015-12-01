@@ -1,7 +1,6 @@
 <App Theme="Basic">
   <JavaScript File="lodash.js" ux:Global="lodash" />
   <JavaScript>
-    console.log("---------------------------------");
     var Observable = require('FuseJS/Observable');
     var _ = require('lodash');
 
@@ -18,6 +17,7 @@
       this.width = Observable(width);
       this.height = Observable(height);
       this.numberOfMines = numberOfMines;
+      this.cells = Observable();
       this.initBoard();
       this.placeMines();
       this.updateMineRadar();
@@ -31,13 +31,16 @@
         this.initBoard();
         this.placeMines();
         this.updateMineRadar();
+        console.log("---------------------------------");
+        console.log(this.toString());
       },
       initBoard: function() {
         var self = this;
-        self.cells = Observable();
+        var cells = [];
         self.iterateCells(function(cell, x, y) {
-          self.cells.add(new Cell(x, y));
+          cells.push(new Cell(x, y));
         });
+        self.cells.replaceAll(cells);
       },
       placeMines: function() {
         var minesLeft = this.numberOfMines;
@@ -56,8 +59,10 @@
       },
       cellAt: function(x, y) {
         if( x>=0 && y>=0 && x<this.width.value && y<this.height.value ) {
-          return this.cells.getAt(this.width.value*y + x);
+          var ix = this.width.value*y + x;
+          return this.cells.getAt(ix);
         }
+        // point is outside grid
         return null;
       },
       updateMineRadar: function() {
@@ -118,22 +123,30 @@
 
 
     var board = new Board(8, 8, 8);
-    console.log(board.toString());
 
     function cellClicked(item) {
       board.cellClicked(item.data);
     }
 
 
+
     module.exports = {
       cells: board.cells,
       cellClicked: cellClicked,
-      board: board
+      board: board,
+      bigGameClicked: function() {
+        board.restartGame(8, 8, 8);
+      },
+      smallGameClicked: function() {
+        board.restartGame(5,5,5);
+      },
     };
 
   </JavaScript>
 
-  <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto">
+<StackPanel>
+
+  <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto" Height="500">
     <Each Items="{cells}">
 
       <Panel Clicked="{cellClicked}" Width="40" Height="40">
@@ -155,4 +168,8 @@
 
     </Each>
   </Grid>
+
+  <Button Text="Small" Clicked="{smallGameClicked}" Height="25"/>
+  <Button Text="Big" Clicked="{bigGameClicked}" Height="25"/>
+</StackPanel>
 </App>
