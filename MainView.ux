@@ -15,8 +15,8 @@
     }
 
     function Board(width, height, numberOfMines) {
-      this.width = width;
-      this.height = height;
+      this.width = Observable(width);
+      this.height = Observable(height);
       this.numberOfMines = numberOfMines;
       this.initBoard();
       this.placeMines();
@@ -24,31 +24,39 @@
     }
 
     Board.prototype = {
+      restartGame: function(width, height, numberOfMines) {
+        this.width.value = width;
+        this.height.value = height;
+        this.numberOfMines = numberOfMines;
+        this.initBoard();
+        this.placeMines();
+        this.updateMineRadar();
+      },
       initBoard: function() {
         var self = this;
-        self.cells = [];
+        self.cells = Observable();
         self.iterateCells(function(cell, x, y) {
-          self.cells.push(new Cell(x, y));
+          self.cells.add(new Cell(x, y));
         });
       },
       placeMines: function() {
         var minesLeft = this.numberOfMines;
         while( minesLeft>0 ) {
-          var ix = Math.floor(Math.random()*this.width*this.height);
-          if( !this.cells[ix].hasMine ) {
-            this.cells[ix].hasMine = true;
+          var ix = Math.floor(Math.random()*this.width.value*this.height.value);
+          if( !this.cells.getAt(ix).hasMine ) {
+            this.cells.getAt(ix).hasMine = true;
             minesLeft--;
           }
         }
       },
-      minesAt: function(x,y) {
+      minesAt: function(x, y) {
         var cell = this.cellAt(x, y);
         if( !cell ) return 0;
         return cell.hasMine ? 1 : 0;
       },
-      cellAt: function(x,y) {
-        if( x>=0 && y>=0 && x<this.width && y<this.height ) {
-          return this.cells[this.width*y + x];
+      cellAt: function(x, y) {
+        if( x>=0 && y>=0 && x<this.width.value && y<this.height.value ) {
+          return this.cells.getAt(this.width.value*y + x);
         }
         return null;
       },
@@ -90,9 +98,9 @@
       },
       iterateCells: function(callback) {
         var self = this;
-        _.times(self.height, function(y) {
-          _.times(self.width, function(x) {
-            var cell = self.cells[y*self.width + x];
+        _.times(self.height.value, function(y) {
+          _.times(self.width.value, function(x) {
+            var cell = self.cellAt(x, y);
             callback.call(self, cell, x, y);
           });
         });
@@ -104,10 +112,10 @@
             if( x==0 && y>0 ) string += "\n";
             string += "["+ (cell.hasMine?'*':' ') +cell.mineRadar +"]";
         });
-
         return string;
       }
     };
+
 
     var board = new Board(8, 8, 8);
     console.log(board.toString());
@@ -118,7 +126,7 @@
 
 
     module.exports = {
-      cells: Observable.apply(this, board.cells),
+      cells: board.cells,
       cellClicked: cellClicked,
       board: board
     };
