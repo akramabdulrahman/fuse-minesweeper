@@ -131,7 +131,6 @@
 
 
     module.exports = {
-      cells: board.cells,
       cellClicked: cellClicked,
       board: board,
       bigGameClicked: function() {
@@ -147,7 +146,7 @@
 <StackPanel>
 
   <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto" Height="500">
-    <Each Items="{cells}">
+    <Each Items="{board.cells}">
 
       <Panel Clicked="{cellClicked}" Width="40" Height="40">
         <Match Value="{state}">
