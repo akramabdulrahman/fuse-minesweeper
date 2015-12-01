@@ -1,6 +1,6 @@
 <App Theme="Basic">
   <Font File="Assets/Roboto-Black.ttf" ux:Global="Black" />
-  <JavaScript File="lodash.js" ux:Global="lodash" />
+  <JavaScript File="vendor/lodash.js" ux:Global="lodash" />
   <JavaScript>
     var Observable = require('FuseJS/Observable');
     var _ = require('lodash');
