@@ -130,18 +130,13 @@
       }
     };
 
-
     var board = new Board(8, 8, 8);
 
-    function cellClicked(item) {
-      board.cellClicked(item.data);
-    }
-
-
-
     module.exports = {
-      cellClicked: cellClicked,
       board: board,
+      cellClicked: function(item) {
+        board.cellClicked(item.data);
+      },
       bigGameClicked: function() {
         board.restartGame(8, 8, 8);
       },
