@@ -19,6 +19,7 @@
       this.height = Observable(height);
       this.numberOfMines = numberOfMines;
       this.cells = Observable();
+      this.won = Observable(false);
       this.initBoard();
       this.placeMines();
       this.updateMineRadar();
@@ -30,6 +31,7 @@
         this.height.value = height;
         this.numberOfMines = numberOfMines;
         this.opensLeftToWin = width * height - numberOfMines;
+        this.won.value = false;
         this.initBoard();
         this.placeMines();
         this.updateMineRadar();
@@ -106,7 +108,7 @@
         }
       },
       celebrateVictory: function() {
-        console.log("YOU WON!");
+        this.won.value = true;
       },
       iterateCells: function(callback) {
         var self = this;
@@ -149,8 +151,16 @@
     };
 
   </JavaScript>
-
 <StackPanel>
+<Panel Height="0">
+  <Image File="Assets/winner.jpg" Width="100" Height="100" X="-100" Y="-70">
+    <WhileTrue Value="{board.won}">
+      <Rotate Degrees="5"/>
+      <Move X="250" Y="100" Duration="1" DurationBack="0.2"/>
+      <Scale Factor="2" Duration="1" Easing="BounceIn" DurationBack="0.2" EasingBack="BounceOut"/>
+    </WhileTrue>
+  </Image>
+</Panel>
 
   <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto" Height="500">
     <Each Items="{board.cells}">
