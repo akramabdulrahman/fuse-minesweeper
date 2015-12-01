@@ -29,6 +29,7 @@
         this.width.value = width;
         this.height.value = height;
         this.numberOfMines = numberOfMines;
+        this.opensLeftToWin = width * height - numberOfMines;
         this.initBoard();
         this.placeMines();
         this.updateMineRadar();
@@ -89,6 +90,8 @@
         if( cell.state.value != 'closed' ) return;
 
         cell.state.value = cell.mineRadar==0 ? "minesFarAway" : "minesNear";
+        if( --this.opensLeftToWin == 0 ) this.celebrateVictory();
+
         if( cell.mineRadar == 0 ) {
           this.recursiveOpen(x-1, y-1);
           this.recursiveOpen(x  , y-1);
@@ -101,6 +104,9 @@
           this.recursiveOpen(x  , y+1);
           this.recursiveOpen(x+1, y+1);
         }
+      },
+      celebrateVictory: function() {
+        console.log("YOU WON!");
       },
       iterateCells: function(callback) {
         var self = this;
