@@ -146,18 +146,19 @@
     };
 
   </JavaScript>
-<StackPanel>
-<Panel Height="0">
-  <Image File="Assets/winner.jpg" Width="100" Height="100" X="-100" Y="-70">
-    <WhileTrue Value="{board.won}">
-      <Rotate Degrees="5"/>
-      <Move X="250" Y="100" Duration="1" DurationBack="0.2"/>
-      <Scale Factor="2" Duration="1" Easing="BounceIn" DurationBack="0.2" EasingBack="BounceOut"/>
-    </WhileTrue>
-  </Image>
-</Panel>
 
-  <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto" Height="500">
+<StackPanel>
+  <Panel Height="0">
+    <Image File="Assets/winner.jpg" Width="100" Height="100" X="-100" Y="-70">
+      <WhileTrue Value="{board.won}">
+        <Rotate Degrees="5"/>
+        <Move X="250" Y="100" Duration="1" DurationBack="0.2"/>
+        <Scale Factor="2" Duration="1" Easing="BounceIn" DurationBack="0.2" EasingBack="BounceOut"/>
+      </WhileTrue>
+    </Image>
+  </Panel>
+
+  <Grid Alignment="Center" ColumnCount="{board.width}" DefaultColumn="auto" Height="500" ux:Name="grid">
     <Each Items="{board.cells}">
 
       <Panel Width="40" Height="40">
@@ -189,7 +190,15 @@
     </Each>
   </Grid>
 
-  <Button Text="Small" Clicked="{smallGameClicked}" Height="25"/>
-  <Button Text="Big" Clicked="{bigGameClicked}" Height="25"/>
+  <Button Text="Small" Clicked="{smallGameClicked}" Height="25">
+    <Clicked>
+      <Scale Target="grid" Factor="0.01" Duration="0.5"/>
+    </Clicked>
+  </Button>
+  <Button Text="Big" Clicked="{bigGameClicked}" Height="25">
+    <Clicked>
+      <Scale Target="grid" Factor="0.01" Duration="0.5"/>
+    </Clicked>
+  </Button>
 </StackPanel>
 </App>
