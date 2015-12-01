@@ -1,4 +1,5 @@
 <App Theme="Basic">
+  <Font File="Assets/Roboto-Black.ttf" ux:Global="Black" />
   <JavaScript File="lodash.js" ux:Global="lodash" />
   <JavaScript>
     var Observable = require('FuseJS/Observable');
@@ -158,7 +159,7 @@
             </Rectangle>
           </Case>
           <Case String="minesNear">
-            <Text Alignment="Center" Value="{mineRadar}" Width="30" Height="30"/>
+            <Text Font="Black" TextColor="#606060" TextAlignment="Center" Alignment="Center" Value="{mineRadar}" Width="30" Height="30"/>
           </Case>
           <Case String="minesFarAway">
             <Rectangle Width="30" Height="30" CornerRadius="5" Fill="#F0F0F0"/>
